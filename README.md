@@ -14,6 +14,23 @@ GhostBox transforms a **Raspberry Pi Zero 2W** into a portable security research
 
 ---
 
+## Screenshots
+
+### Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+
+### USB Arsenal
+![USB Arsenal](docs/screenshots/usb.png)
+
+### WiFi Scanner
+![WiFi Scanner](docs/screenshots/wifi.png)
+
+### Bluetooth Recon
+![Bluetooth Recon](docs/screenshots/bluetooth.png)
+
+### Evil Twin
+![Evil Twin](docs/screenshots/evil_twin.png)
+
 ---
 
 ## Features
