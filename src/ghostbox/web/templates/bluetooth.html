@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}BT Recon{% endblock %}
+{% block breadcrumb %}Bluetooth Recon{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">🔵 Bluetooth Recon</div>
+    <div class="page-subtitle">Classic BT discovery + BLE scanning via bleak</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="badge badge-{{ module.status }}" data-module="bluetooth">{{ module.status }}</span>
+    <button class="btn btn-cyan"  onclick="moduleAction('bluetooth','start')">▶ Start</button>
+    <button class="btn btn-red"   onclick="moduleAction('bluetooth','stop')">■ Stop</button>
+    <button class="btn btn-ghost" onclick="loadBtDevices()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- Device table -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">📱 Discovered Devices</div>
+    <span style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">
+      {{ devices|length }} devices
+    </span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Type</th>
+          <th>RSSI</th>
+          <th>Manufacturer</th>
+          <th>Class</th>
+          <th>Last Seen</th>
+        </tr>
+      </thead>
+      <tbody id="btTableBody">
+        {% for d in devices %}
+        <tr>
+          <td style="color:var(--cyan);font-weight:600">{{ d.name or 'Unknown' }}</td>
+          <td style="color:var(--muted)">{{ d.address }}</td>
+          <td>
+            <span class="dev-type {{ 'dev-ble' if d.device_type == 'ble' else 'dev-classic' }}">
+              {{ d.device_type | upper }}
+            </span>
+          </td>
+          <td style="color:{% if d.rssi > -60 %}var(--green){% elif d.rssi > -75 %}var(--orange){% else %}var(--red){% endif %}">
+            {{ d.rssi }} dBm
+          </td>
+          <td style="color:var(--muted)">{{ d.manufacturer }}</td>
+          <td style="color:var(--muted)">{{ d.device_class }}</td>
+          <td style="color:var(--muted)">{{ d.last_seen[:19] if d.last_seen else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align:center;color:var(--muted);padding:2rem;font-family:var(--font-mono)">
+            No devices discovered yet — press Start
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Event feed -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">📋 Scan Events</div>
+  </div>
+  <div class="card-body" style="padding:.75rem">
+    <div class="event-feed" id="eventFeed" style="max-height:300px"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(loadBtDevices, 20000);
+  fetch('/api/bluetooth/events').then(r=>r.json()).then(evs => {
+    evs.forEach(e => prependEvent(e));
+  });
+});
+</script>
+{% endblock %}

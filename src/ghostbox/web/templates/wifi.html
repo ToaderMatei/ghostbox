@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}WiFi Scanner{% endblock %}
+{% block breadcrumb %}WiFi Scanner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">📡 WiFi Scanner</div>
+    <div class="page-subtitle">Active network discovery via iwlist · onboard wlan0</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="badge badge-{{ module.status }}" data-module="wifi">{{ module.status }}</span>
+    <button class="btn btn-cyan" onclick="moduleAction('wifi','start')">▶ Start Scan</button>
+    <button class="btn btn-red"  onclick="moduleAction('wifi','stop')">■ Stop</button>
+    <button class="btn btn-ghost" onclick="loadWifiNetworks()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- Network table -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">📡 Discovered Networks</div>
+    <span style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">
+      {{ networks|length }} networks
+    </span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>SSID</th>
+          <th>BSSID</th>
+          <th>Channel</th>
+          <th>Signal</th>
+          <th>Encryption</th>
+          <th>Vendor</th>
+          <th>Last Seen</th>
+        </tr>
+      </thead>
+      <tbody id="wifiTableBody">
+        {% for n in networks %}
+        <tr>
+          <td style="color:var(--text);font-weight:600">{{ n.ssid }}</td>
+          <td style="color:var(--muted)">{{ n.bssid }}</td>
+          <td>CH {{ n.channel }}</td>
+          <td>
+            <span style="color:
+              {% if n.signal > -60 %}var(--green)
+              {% elif n.signal > -75 %}var(--orange)
+              {% else %}var(--red){% endif %}">
+              {{ n.signal }} dBm
+            </span>
+          </td>
+          <td>
+            <span class="enc
+              {% if n.encryption == 'OPEN' %}enc-open
+              {% elif n.encryption == 'WPA2' %}enc-wpa2
+              {% elif n.encryption == 'WPA' %}enc-wpa
+              {% else %}enc-wep{% endif %}">
+              {{ n.encryption }}
+            </span>
+          </td>
+          <td style="color:var(--muted)">{{ n.vendor }}</td>
+          <td style="color:var(--muted)">{{ n.last_seen[:19] if n.last_seen else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align:center;color:var(--muted);padding:2rem;font-family:var(--font-mono)">
+            No networks discovered yet — press Start Scan
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Live event feed for wifi -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">📋 Scan Events</div>
+  </div>
+  <div class="card-body" style="padding:.75rem">
+    <div class="event-feed" id="eventFeed" style="max-height:300px"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(loadWifiNetworks, 15000);
+  // Load wifi-specific events into feed
+  fetch('/api/wifi/events').then(r=>r.json()).then(evs => {
+    evs.forEach(e => prependEvent(e));
+  });
+});
+</script>
+{% endblock %}

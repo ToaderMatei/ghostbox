@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GhostBox{% endblock %} — Security Toolkit</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">👻</span>
+      <span class="logo-text">GhostBox</span>
+      <span class="logo-version">v1.0</span>
+    </div>
+
+    <span class="nav-section">Navigation</span>
+    <a href="/"          class="nav-item" data-path="/"><span class="icon">🏠</span> Dashboard</a>
+    <a href="/usb"       class="nav-item" data-path="/usb"><span class="icon">🔌</span> USB Arsenal</a>
+    <a href="/wifi"      class="nav-item" data-path="/wifi"><span class="icon">📡</span> WiFi Scanner</a>
+    <a href="/bluetooth" class="nav-item" data-path="/bluetooth"><span class="icon">🔵</span> BT Recon</a>
+    <a href="/evil-twin" class="nav-item" data-path="/evil-twin"><span class="icon">👻</span> Evil Twin</a>
+
+    <span class="nav-section" style="margin-top:.5rem">System</span>
+    <a href="/api/docs"  class="nav-item" target="_blank"><span class="icon">📖</span> API Docs</a>
+
+    <div class="sidebar-footer">
+      Pi Zero 2W · ARM64<br>
+      <span style="color:var(--green)">●</span> System Online
+    </div>
+  </aside>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <span class="topbar-title">{% block topbar_title %}GhostBox / {% block breadcrumb %}{% endblock %}{% endblock %}</span>
+    <div class="topbar-right">
+      <div class="ws-indicator">
+        <div class="ws-dot"></div>
+        <span class="ws-label">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<script src="/static/js/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

