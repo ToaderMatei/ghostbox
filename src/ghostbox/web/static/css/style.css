@@ -3,30 +3,45 @@
    ───────────────────────────────────────────────────────────── */
 
 :root {
-  --bg:        #0d0f14;
-  --surface:   #141720;
-  --surface2:  #1a1e2e;
-  --border:    #252a3d;
-  --green:     #00ff9d;
-  --cyan:      #00cfff;
-  --red:       #ff4d6d;
-  --orange:    #ff8c42;
+  --bg:        #0b0708;
+  --surface:   #140b0d;
+  --surface2:  #241417;
+  --border:    #2a1619;
+  --border-hover: #4a2328;
+  --accent:    #ff2b3a;
+  --accent-2:  #ff7a6b;
+  --accent-dim: rgba(255, 43, 58, 0.12);
+  --green:     #22c55e;
+  --cyan:      #38bdf8;
+  --red:       #ef4444;
+  --orange:    #f59e0b;
   --purple:    #b47eff;
-  --text:      #e2e8f0;
-  --muted:     #64748b;
+  --text:      #f6efef;
+  --muted:     #9c8285;
+  --grid-line: rgba(255, 50, 60, 0.035);
+  --glow:      0 0 22px rgba(255, 43, 58, 0.25);
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   height: 100%;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-attachment: fixed;
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+
+::selection { background: var(--accent); color: #fff; }
 
 /* ── Layout ── */
 .layout {
@@ -77,7 +92,7 @@ html, body {
   background: var(--muted);
   transition: background .3s;
 }
-.ws-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.ws-dot.connected { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 
 /* ── Sidebar ── */
 .sidebar {
@@ -100,16 +115,16 @@ html, body {
 
 .logo-icon {
   font-size: 1.5rem;
-  filter: drop-shadow(0 0 8px var(--green));
+  filter: drop-shadow(0 0 8px var(--accent));
 }
 
 .logo-text {
   font-family: var(--font-mono);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--green);
+  color: var(--accent);
   letter-spacing: .05em;
-  text-shadow: 0 0 20px rgba(0,255,157,.4);
+  text-shadow: 0 0 20px rgba(255,43,58,.4);
 }
 
 .logo-version {
@@ -145,15 +160,15 @@ html, body {
 }
 
 .nav-item:hover, .nav-item.active {
-  background: rgba(0,255,157,.07);
-  color: var(--green);
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .nav-item .icon { font-size: 1rem; width: 18px; text-align: center; }
 
 .nav-badge {
   margin-left: auto;
-  background: var(--green);
+  background: var(--accent);
   color: var(--bg);
   font-size: .65rem;
   font-weight: 700;
@@ -511,7 +526,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
   color: var(--green);
 }
 
-.terminal .prompt { color: var(--cyan); }
+.terminal .prompt { color: var(--accent); }
 .terminal .output { color: var(--muted); }
 .terminal .error  { color: var(--red); }
 
@@ -532,8 +547,8 @@ textarea.ducky-editor {
 }
 
 textarea.ducky-editor:focus {
-  border-color: rgba(0,255,157,.4);
-  box-shadow: 0 0 0 3px rgba(0,255,157,.05);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
 /* ── Tabs ── */
@@ -556,8 +571,8 @@ textarea.ducky-editor:focus {
   transition: color .15s;
 }
 
-.tab.active, .tab:hover { color: var(--green); }
-.tab.active { border-bottom-color: var(--green); }
+.tab.active, .tab:hover { color: var(--accent); }
+.tab.active { border-bottom-color: var(--accent); }
 
 /* ── Input / select ── */
 .form-group { margin-bottom: 1rem; }
@@ -584,7 +599,7 @@ textarea.ducky-editor:focus {
 }
 
 .form-input:focus, .form-select:focus {
-  border-color: rgba(0,207,255,.4);
+  border-color: var(--accent);
 }
 
 .form-row {
@@ -609,7 +624,7 @@ textarea.ducky-editor:focus {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ── Toast notifications ── */
 .toast-container {
@@ -654,3 +669,55 @@ textarea.ducky-editor:focus {
   .sidebar { display: none; }
   .form-row { grid-template-columns: 1fr; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+   m68k red-terminal cohesion layer
+   ───────────────────────────────────────────────────────────── */
+.sidebar { position: relative; }
+.sidebar::after {
+  content: '';
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--accent), transparent 40%);
+  opacity: .5;
+}
+.topbar { position: relative; }
+.topbar::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent 60%);
+  opacity: .4;
+}
+
+.page-title { font-family: var(--font-mono); letter-spacing: -.01em; }
+
+/* terminal-style prompt before the dashboard subtitle */
+.page-subtitle::before { content: '> '; color: var(--accent); }
+
+/* card + stat hover glow, matching site terminal windows */
+.card, .stat-card, .module-card { transition: border-color .18s, box-shadow .18s, transform .18s; }
+.stat-card:hover, .module-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--glow);
+  transform: translateY(-2px);
+}
+.card:hover { border-color: var(--border-hover); }
+
+/* primary accent button (red) used for key actions */
+.btn-accent {
+  background: var(--accent-dim);
+  border-color: rgba(255,43,58,.35);
+  color: var(--accent);
+}
+.btn-accent:hover { background: rgba(255,43,58,.2); box-shadow: var(--glow); }
+
+/* buttons share the site's glow-on-hover */
+.btn:hover { box-shadow: 0 0 14px rgba(255,43,58,.18); }
+
+/* blinking cursor helper (used in headers) */
+.cursor::after {
+  content: '_'; color: var(--accent);
+  margin-left: 2px; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }

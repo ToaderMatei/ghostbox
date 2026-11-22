@@ -6,7 +6,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 [![Platform](https://img.shields.io/badge/Platform-RPi_Zero_2W-red?style=flat-square&logo=raspberry-pi)](https://www.raspberrypi.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/yourusername/ghostbox?style=flat-square)](https://github.com/yourusername/ghostbox)
+[![Stars](https://img.shields.io/github/stars/ToaderMatei/ghostbox?style=flat-square)](https://github.com/ToaderMatei/ghostbox)
 
 GhostBox transforms a **Raspberry Pi Zero 2W** into a portable security research platform with a real-time web dashboard. Built with Python 3.10+ and FastAPI.
 

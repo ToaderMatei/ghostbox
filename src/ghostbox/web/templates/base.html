@@ -6,7 +6,8 @@
   <title>{% block title %}GhostBox{% endblock %} — Security Toolkit</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -40,6 +41,7 @@
   <header class="topbar">
     <span class="topbar-title">{% block topbar_title %}GhostBox / {% block breadcrumb %}{% endblock %}{% endblock %}</span>
     <div class="topbar-right">
+      <span id="clock" class="topbar-clock mono" style="font-family:var(--font-mono);font-size:.75rem;color:var(--muted)"></span>
       <div class="ws-indicator">
         <div class="ws-dot"></div>
         <span class="ws-label">Connecting…</span>
@@ -55,6 +57,17 @@
 </div>
 
 <script src="/static/js/app.js"></script>
+<script>
+  (function () {
+    var el = document.getElementById('clock');
+    if (!el) return;
+    function tick() {
+      el.textContent = new Date().toISOString().slice(11, 19) + ' UTC';
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
